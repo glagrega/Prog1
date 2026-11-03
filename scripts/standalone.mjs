@@ -1,0 +1,13 @@
+import { readFile, writeFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
+const root = resolve(import.meta.dirname, '..');
+let html = await readFile(resolve(root, 'dist/index.html'), 'utf8');
+const scriptTag = html.match(/<script\b[^>]*src="([^"]+)"[^>]*><\/script>/);
+const cssTag = html.match(/<link\b[^>]*href="([^"]+\.css)"[^>]*>/);
+if (!scriptTag || !cssTag) throw new Error('No se encontraron los recursos compilados.');
+const js = await readFile(resolve(root, 'dist', scriptTag[1].replace(/^\//, '')), 'utf8');
+const css = await readFile(resolve(root, 'dist', cssTag[1].replace(/^\//, '')), 'utf8');
+html = html.replace(scriptTag[0], '').replace(cssTag[0], () => `<style>${css}</style>`);
+html = html.replace('</body>', () => `<script>${js.replace(/<\/script/gi, '<\\/script')}</script>\n</body>`);
+await writeFile(resolve(root, 'vista-previa.html'), html);
+console.log('Generado vista-previa.html: aplicación autocontenida, sin servidor ni recursos externos.');
