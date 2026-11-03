@@ -28,6 +28,7 @@ Aplicación web minimalista en español para cargar preguntas desde Excel y eleg
 1. Selecciona o arrastra un archivo **.xlsx**, de hasta 10 MB.
 2. Usa la primera hoja, con una columna llamada **Pregunta** (también se admite Preguntas). Sin encabezado, se utiliza la primera columna. Escribe una pregunta de texto por fila.
 3. Pulsa **Elegir una pregunta**. Puedes seguir sorteando: cada selección es independiente y puede repetirse.
+4. Pulsa **Borrar banco de preguntas** para quitar las preguntas guardadas en este navegador y limpiar la pregunta mostrada. El Excel original permanece intacto; puedes volver a cargarlo cuando quieras.
 
 Se omiten filas vacías y preguntas duplicadas. Cada carga válida reemplaza el banco anterior; si un archivo falla, se conserva el banco actual. Los archivos .xls antiguos deben guardarse como .xlsx desde Excel o LibreOffice.
 

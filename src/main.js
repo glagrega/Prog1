@@ -24,6 +24,7 @@ document.querySelector('#app').innerHTML = `
         <label class="dropzone" id="dropzone" for="excel"><span class="upload-icon" aria-hidden="true">↑</span><strong>Seleccionar archivo</strong><span>o arrastra tu Excel aquí</span><small>.xlsx · máximo 10 MB</small><input id="excel" type="file" accept=".xlsx" aria-describedby="format-help" /></label>
         <p class="format-help" id="format-help">Usa una columna <strong>Pregunta</strong> o escribe las preguntas en la primera columna, una por fila. Se lee la primera hoja y se omiten vacíos y duplicados.</p>
         <div class="bank-info"><span class="dot" aria-hidden="true"></span><span id="bank-status"></span></div><p id="file-name" class="file-name"></p>
+        <button id="clear-bank" class="clear-button" disabled>Borrar banco de preguntas</button>
         <p class="privacy">Tu archivo se procesa en este navegador. El banco queda guardado en este dispositivo; no se envía a un servidor.</p>
       </section>
       <section class="question-panel" aria-labelledby="question-title"><div class="question-heading"><span class="step">02 / DESCUBRE</span><span class="pill">SELECCIÓN ALEATORIA</span></div>
@@ -37,16 +38,33 @@ document.querySelector('#app').innerHTML = `
 
 const fileInput = document.querySelector('#excel');
 const draw = document.querySelector('#draw');
+const clearBank = document.querySelector('#clear-bank');
 const message = document.querySelector('#message');
 const title = document.querySelector('#question-title');
 const hint = document.querySelector('#question-hint');
 function updateBank() {
   draw.disabled = loading || !questions.length;
+  clearBank.disabled = loading || !questions.length;
   fileInput.disabled = loading;
   document.querySelector('#bank-status').textContent = loading ? 'Leyendo archivo…' : questions.length ? `${questions.length} pregunta${questions.length === 1 ? '' : 's'} disponible${questions.length === 1 ? '' : 's'}` : 'Aún no hay preguntas';
   document.querySelector('#file-name').textContent = filename;
   document.querySelector('.bank-info').classList.toggle('has-bank', !!questions.length);
 }
+clearBank.addEventListener('click', () => {
+  if (loading || !questions.length) return;
+  let removed = true;
+  try { localStorage.removeItem(storageKey); } catch { removed = false; }
+  questions = [];
+  filename = '';
+  fileInput.value = '';
+  title.textContent = 'La próxima pregunta está por llegar.';
+  hint.textContent = 'Carga un banco para comenzar.';
+  draw.firstChild.textContent = 'Elegir una pregunta ';
+  updateBank();
+  message.textContent = removed
+    ? 'Banco de preguntas borrado. Puedes cargar otro Excel.'
+    : 'Banco borrado de esta sesión. No se pudo eliminar del almacenamiento del navegador; podría reaparecer al recargar.';
+});
 async function importFile(file) {
   if (!file || loading) return;
   message.textContent = '';
